@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand+Pre:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand+Pre:wght@400..700&family=Satisfy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@theme {
+  --font-lato: Lato, "sans-serif";
+  --font-inter: Inter, "sans-serif";
+  --font-carta: Edu VIC WA NT Hand Pre "sans-serif";
+  --font-satisfy: Satisfy, "sans-serif";
+  --font-pacifico: Pacifico, "cursive";
+  --color-verdementa: #5cdb95;
+  --color-azulprofundo: #05386b;
+  --color-blancoverdoso: #edf5e1;
+  --color-verdeclaro: #8ee4af;
+  --color-verdeesmeralda: #379683;
+  --color-negro: #000000;
+  --color-blanco: #FFFFFF;
+}
+
