@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react"
 import { ArrowRight, Target, Recycle } from "lucide-react"
+import mundoImg from "../assets/mundo.png"
+import florImg from "../assets/flor.png"
+import arbolImg from "../assets/Arbol.png"
+import pezImg from "../assets/pez.png"
+import capetaImg from "../assets/Capeta.png"
+import lupaImg from "../assets/lupa.png"
+import juegoImg from "../assets/juego.png"
 
 // Imagenes para las cards (puedes cambiar las URLs)
 const cardImages = [
@@ -10,12 +17,20 @@ const cardImages = [
 export default function Inicio() {
   const [scrollY, setScrollY] = useState(0)
   const [currentGame, setCurrentGame] = useState(0)
+  const [usuarioNino, setUsuarioNino] = useState(null)
 
   // Efecto parallax sutil
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const usuario = localStorage.getItem("usuarioNino")
+    if (usuario) {
+      setUsuarioNino(JSON.parse(usuario))
+    }
   }, [])
 
   // Datos para los juegos
@@ -26,12 +41,14 @@ export default function Inicio() {
       description:
         "Arrastra cada residuo al contenedor correcto. ¡Conviértete en un experto del reciclaje mientras juegas!",
       buttonText: "¡Jugar ahora!",
+      image: capetaImg,
     },
     {
       icon: "🔍",
       title: "Detective Ambiental",
       description: "Encuentra todos los elementos contaminantes en la imagen. ¡Pon a prueba tu ojo ecológico!",
       buttonText: "¡Investigar!",
+      image: lupaImg,
     },
   ]
 
@@ -73,14 +90,47 @@ export default function Inicio() {
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           {/* Planeta Tierra */}
           <div className="mb-8">
-            <div className="w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] mx-auto bg-gradient-to-br from-verdementa to-verdeclaro rounded-full flex items-center justify-center shadow-2xl animate-pulse">
-              <div className="text-[10rem] md:text-[14rem]">🌍</div>
+            <div className="relative w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] mx-auto">
+              {/* Sombra exterior */}
+              <div className="absolute inset-0 bg-gradient-to-br from-verdementa/30 to-azulprofundo/30 rounded-full blur-3xl scale-110 animate-pulse"></div>
+              
+              {/* Contenedor principal con gradiente */}
+              <div className="relative w-full h-full bg-gradient-to-br from-verdementa/20 via-verdeesmeralda/30 to-azulprofundo/20 rounded-full flex items-center justify-center shadow-2xl animate-float overflow-hidden border-4 border-white/20 backdrop-blur-sm">
+                {/* Imagen del mundo */}
+                <img 
+                  src={mundoImg} 
+                  alt="Planeta Tierra" 
+                  className="w-full h-full object-cover rounded-full shadow-inner hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                
+                {/* Overlay de brillo */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 rounded-full pointer-events-none"></div>
+                
+                {/* Efecto de resplandor */}
+                <div className="absolute inset-0 bg-gradient-to-br from-verdementa/20 to-verdeesmeralda/20 rounded-full animate-pulse opacity-60"></div>
+              </div>
+              
+              {/* Partículas flotantes alrededor */}
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-verdeesmeralda rounded-full animate-ping"
+                    style={{
+                      left: `${20 + (i * 15)}%`,
+                      top: `${30 + (i * 10)}%`,
+                      animationDelay: `${i * 0.5}s`,
+                      animationDuration: '2s'
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Mensaje de bienvenida */}
           <h1 className="font-lato text-4xl md:text-6xl font-bold text-azulprofundo mb-6 leading-tight">
-            ¡Bienvenido/a a Eco Detectives!
+            ¡Bienvenido/a a Eco Detectives{usuarioNino ? `, ${usuarioNino.nombre}` : ""}!
           </h1>
 
           <p className="font-inter text-xl md:text-2xl text-azulprofundo/80 mb-8 max-w-2xl mx-auto">
@@ -109,12 +159,12 @@ export default function Inicio() {
         {/* Primera fila - movimiento hacia la derecha */}
         <div className="absolute top-6 left-0 w-full h-32 md:h-48 flex animate-scroll-right gap-x-2">
           {Array.from({length: 2}).flatMap((_, j) => (
-            [...Array(10)].map((_, i) => (
+            [florImg, arbolImg, pezImg, florImg, arbolImg, pezImg].map((img, i) => (
               <div
-                key={j*10 + i}
-                className="flex-shrink-0 w-72 md:w-[28rem] h-32 md:h-48 bg-gradient-to-r from-verdementa to-verdeclaro rounded-2xl flex items-center justify-center shadow-lg"
+                key={j*6 + i}
+                className="flex-shrink-0 w-72 md:w-[28rem] h-32 md:h-48 bg-gradient-to-r from-verdementa to-verdeclaro rounded-2xl flex items-center justify-center shadow-lg overflow-hidden"
               >
-                <div className="text-2xl md:text-4xl">{i % 2 === 0 ? "🌳🦋" : "🏭💨"}</div>
+                <img src={img} alt="Carrusel" className="h-24 md:h-32 object-contain drop-shadow-xl transition-transform duration-500 hover:scale-105" />
               </div>
             ))
           ))}
@@ -123,12 +173,12 @@ export default function Inicio() {
         {/* Segunda fila - movimiento hacia la izquierda */}
         <div className="absolute bottom-6 left-0 w-full h-32 md:h-48 flex animate-scroll-left gap-x-2">
           {Array.from({length: 2}).flatMap((_, j) => (
-            [...Array(10)].map((_, i) => (
+            [florImg, arbolImg, pezImg, florImg, arbolImg, pezImg].map((img, i) => (
               <div
-                key={j*10 + i}
-                className="flex-shrink-0 w-72 md:w-[28rem] h-32 md:h-48 bg-gradient-to-r from-azulprofundo/20 to-verdeesmeralda/20 rounded-2xl flex items-center justify-center shadow-lg"
+                key={j*6 + i}
+                className="flex-shrink-0 w-72 md:w-[28rem] h-32 md:h-48 bg-gradient-to-r from-azulprofundo/20 to-verdeesmeralda/20 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden"
               >
-                <div className="text-2xl md:text-4xl">{i % 2 === 0 ? "🌊🐟" : "🌸🌿"}</div>
+                <img src={img} alt="Carrusel" className="h-24 md:h-32 object-contain drop-shadow-xl transition-transform duration-500 hover:scale-105" />
               </div>
             ))
           ))}
@@ -148,7 +198,10 @@ export default function Inicio() {
       <section className="py-12 px-2 md:px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="font-lato text-2xl md:text-4xl font-bold text-azulprofundo mb-2">🎮 Juegos Ecológicos</h2>
+            <h2 className="font-lato text-2xl md:text-4xl font-bold text-azulprofundo mb-2 flex items-center justify-center gap-2">
+              <img src={juegoImg} alt="Juegos Ecológicos" className="w-20 h-20 md:w-28 md:h-28 object-contain inline-block animate-bounce-slow" />
+              Juegos Ecológicos
+            </h2>
             <p className="font-inter text-base md:text-lg text-azulprofundo/80">
               Aprende jugando con nuestras aventuras interactivas
             </p>
@@ -157,15 +210,19 @@ export default function Inicio() {
           <div className="w-full flex flex-col items-center">
             <div className="relative w-full max-w-2xl min-h-[22rem] md:min-h-[26rem] bg-blanco rounded-3xl shadow-2xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mb-10 border border-verdementa/20 group cursor-pointer overflow-hidden">
               {/* Imagen decorativa que cubre toda la card al hacer hover */}
-              <div className={`absolute inset-0 bg-[url('${cardImages[currentGame]}')] bg-cover bg-center opacity-0 group-hover:opacity-90 transition-all duration-700 z-20`}></div>
+              <div className={`absolute inset-0 bg-[url('${games[currentGame].image}')] bg-cover bg-center opacity-0 group-hover:opacity-90 transition-all duration-700 z-20`}></div>
 
               {/* Overlay para oscurecer la imagen y ocultar el contenido */}
               <div className="absolute inset-0 bg-azulprofundo/70 opacity-0 group-hover:opacity-80 transition-all duration-700 z-30"></div>
 
               {/* Ícono grande con efecto */}
               <div className="flex justify-center mb-4 relative z-40 pt-10">
-                <div className="bg-gradient-to-br from-verdeesmeralda to-verdeclaro rounded-full p-6 md:p-8 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:rotate-12 transition-transform">
-                  <div className="text-4xl md:text-6xl transition-transform duration-300 group-hover:scale-110">{games[currentGame].icon}</div>
+                <div className="bg-gradient-to-br from-verdeesmeralda to-verdeclaro rounded-full p-6 md:p-8 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:rotate-12 transition-transform flex items-center justify-center">
+                  <img 
+                    src={games[currentGame].image} 
+                    alt={games[currentGame].title + ' icon'} 
+                    className="w-24 h-24 md:w-32 md:h-32 object-contain transition-transform duration-300 group-hover:scale-110" 
+                  />
                 </div>
               </div>
 
@@ -234,6 +291,18 @@ export default function Inicio() {
           }
         }
 
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-8px) rotate(1deg);
+          }
+          66% {
+            transform: translateY(-4px) rotate(-1deg);
+          }
+        }
+
         @keyframes scroll-right {
           0% {
             transform: translateX(-100%);
@@ -262,6 +331,18 @@ export default function Inicio() {
 
         .animate-bubble {
           animation: bubble 16s ease-in-out infinite;
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-18px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2.2s infinite cubic-bezier(0.6, 0.05, 0.2, 0.95);
         }
       `}</style>
     </div>

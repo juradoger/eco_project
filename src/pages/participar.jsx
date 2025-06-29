@@ -29,6 +29,7 @@ import {
   Plus,
   Save,
 } from "lucide-react"
+import userService from '../services/user-service'
 
 export default function Participa() {
   const [formData, setFormData] = useState({
@@ -48,8 +49,6 @@ export default function Participa() {
     name: "",
     nickname: "",
     avatar: "🦸‍♀️",
-    level: "Novato",
-    estimatedTime: "2 min",
     isProfileComplete: false
   })
 
@@ -135,12 +134,6 @@ export default function Participa() {
     "🐱", "🐶", "🦋", "🦜", "🐸", "🦊", "🐼", "🦁"
   ]
 
-  // Niveles disponibles
-  const availableLevels = [
-    "Novato", "Aprendiz", "Detective", "Protector", 
-    "Guardián", "Héroe", "Maestro", "Leyenda"
-  ]
-
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -205,8 +198,19 @@ export default function Participa() {
     }, 2000)
   }
 
-  const handleProfileSave = () => {
+  const handleProfileSave = async () => {
     if (userProfile.name && userProfile.nickname) {
+      // Guardar usuario en Firebase con score 0
+      try {
+        await userService.create({
+          name: userProfile.name,
+          nickname: userProfile.nickname,
+          avatar: userProfile.avatar,
+          score: 0
+        })
+      } catch (error) {
+        console.error('Error al guardar usuario en Firebase:', error)
+      }
       setUserProfile(prev => ({ ...prev, isProfileComplete: true }))
       setShowProfileModal(false)
     }
@@ -327,15 +331,6 @@ export default function Participa() {
                       <div>
                         <h3 className="font-lato font-bold text-azulprofundo text-lg">{userProfile.name}</h3>
                         <p className="font-inter text-azulprofundo/70">@{userProfile.nickname}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="bg-gradient-to-r from-verdementa to-verdeclaro text-blanco px-3 py-1 rounded-full text-xs font-lato font-semibold">
-                            {userProfile.level}
-                          </span>
-                          <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-lato font-semibold">
-                            <Clock className="w-3 h-3" />
-                            {userProfile.estimatedTime}
-                          </div>
-                        </div>
                       </div>
                     </div>
                     <button
@@ -549,13 +544,6 @@ export default function Participa() {
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span className="font-inter text-sm text-azulprofundo/70">{detective.nivel}</span>
-                            <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-lato font-semibold ${getTimeColor(detective.estimatedTime)}`}>
-                              <Clock className="w-3 h-3" />
-                              <span>{detective.estimatedTime}</span>
-                            </div>
-                          </div>
                         </div>
                       </div>
 
@@ -742,36 +730,6 @@ export default function Participa() {
                   placeholder="Ej: EcoHéroe"
                   className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
                 />
-              </div>
-
-              {/* Nivel */}
-              <div>
-                <label className="block font-lato font-bold text-azulprofundo mb-3">Tu Nivel</label>
-                <select
-                  value={userProfile.level}
-                  onChange={(e) => setUserProfile(prev => ({ ...prev, level: e.target.value }))}
-                  className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
-                >
-                  {availableLevels.map((level) => (
-                    <option key={level} value={level}>{level}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Tiempo estimado */}
-              <div>
-                <label className="block font-lato font-bold text-azulprofundo mb-3">Tiempo Estimado de Participación</label>
-                <select
-                  value={userProfile.estimatedTime}
-                  onChange={(e) => setUserProfile(prev => ({ ...prev, estimatedTime: e.target.value }))}
-                  className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
-                >
-                  <option value="1 min">1 minuto</option>
-                  <option value="2 min">2 minutos</option>
-                  <option value="3 min">3 minutos</option>
-                  <option value="5 min">5 minutos</option>
-                  <option value="10 min">10 minutos</option>
-                </select>
               </div>
 
               {/* Botones */}

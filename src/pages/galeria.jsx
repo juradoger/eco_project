@@ -22,6 +22,9 @@ import {
   Image,
   Film,
 } from "lucide-react"
+import { getDocs, collection } from "firebase/firestore"
+import { FirebaseDB } from "../firebase/config"
+import { uploadGalleryImage } from "../services/gallery-service"
 
 export default function Galeria() {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -43,126 +46,17 @@ export default function Galeria() {
   })
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
+  const [galleryItems, setGalleryItems] = useState([])
 
-  // Datos de la galería
-  const galleryItems = [
-    {
-      id: 1,
-      type: "image",
-      category: "naturaleza",
-      title: "Bosque Encantado",
-      description: "Un hermoso bosque lleno de vida y color",
-      author: "María, 8 años",
-      likes: 24,
-      views: 156,
-      thumbnail: "🌲",
-      date: "2024-01-15",
-      imageUrl: "/images/bosque-encantado.jpg",
-      downloadUrl: "/downloads/bosque-encantado.jpg",
-    },
-    {
-      id: 2,
-      type: "video",
-      category: "reciclaje",
-      title: "Cómo hacer una maceta con botellas",
-      description: "Tutorial paso a paso para reciclar botellas de plástico",
-      author: "Carlos, 10 años",
-      likes: 45,
-      views: 289,
-      thumbnail: "🌱",
-      duration: "3:24",
-      date: "2024-01-14",
-      videoUrl: "/videos/maceta-botellas.mp4",
-      downloadUrl: "/downloads/maceta-botellas.mp4",
-    },
-    {
-      id: 3,
-      type: "craft",
-      category: "manualidades",
-      title: "Comedero para pájaros",
-      description: "Manualidad ecológica con materiales reciclados",
-      author: "Ana, 9 años",
-      likes: 38,
-      views: 201,
-      thumbnail: "🐦",
-      steps: 5,
-      date: "2024-01-13",
-      imageUrl: "/images/comedero-pajaros.jpg",
-      downloadUrl: "/downloads/comedero-pajaros.pdf",
-    },
-    {
-      id: 4,
-      type: "drawing",
-      category: "dibujos",
-      title: "La Tierra Sonriente",
-      description: "Dibujo de nuestro planeta feliz y verde",
-      author: "Luis, 7 años",
-      likes: 52,
-      views: 178,
-      thumbnail: "🌍",
-      date: "2024-01-12",
-      imageUrl: "/images/tierra-sonriente.jpg",
-      downloadUrl: "/downloads/tierra-sonriente.jpg",
-    },
-    {
-      id: 5,
-      type: "image",
-      category: "naturaleza",
-      title: "Jardín de Mariposas",
-      description: "Fotografía de mariposas en el jardín escolar",
-      author: "Sofia, 11 años",
-      likes: 31,
-      views: 143,
-      thumbnail: "🦋",
-      date: "2024-01-11",
-      imageUrl: "/images/jardin-mariposas.jpg",
-      downloadUrl: "/downloads/jardin-mariposas.jpg",
-    },
-    {
-      id: 6,
-      type: "video",
-      category: "reciclaje",
-      title: "Separando residuos en casa",
-      description: "Video educativo sobre clasificación de basura",
-      author: "Diego, 9 años",
-      likes: 67,
-      views: 324,
-      thumbnail: "♻️",
-      duration: "2:15",
-      date: "2024-01-10",
-      videoUrl: "/videos/separando-residuos.mp4",
-      downloadUrl: "/downloads/separando-residuos.mp4",
-    },
-    {
-      id: 7,
-      type: "craft",
-      category: "manualidades",
-      title: "Porta lápices ecológico",
-      description: "Hecho con latas recicladas y decorado con hojas",
-      author: "Emma, 8 años",
-      likes: 29,
-      views: 167,
-      thumbnail: "✏️",
-      steps: 4,
-      date: "2024-01-09",
-      imageUrl: "/images/porta-lapices.jpg",
-      downloadUrl: "/downloads/porta-lapices.pdf",
-    },
-    {
-      id: 8,
-      type: "drawing",
-      category: "dibujos",
-      title: "Familia de Árboles",
-      description: "Dibujo colorido de una familia de árboles felices",
-      author: "Pablo, 6 años",
-      likes: 41,
-      views: 192,
-      thumbnail: "🌳",
-      date: "2024-01-08",
-      imageUrl: "/images/familia-arboles.jpg",
-      downloadUrl: "/downloads/familia-arboles.jpg",
-    },
-  ]
+  // Cargar galería desde Firestore
+  useEffect(() => {
+    const fetchGallery = async () => {
+      const snapshot = await getDocs(collection(FirebaseDB, "gallery"))
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      setGalleryItems(items)
+    }
+    fetchGallery()
+  }, [showUploadModal === false]) // recarga al cerrar modal de subida
 
   const categories = [
     { id: "all", name: "Todo", icon: Grid3X3, count: galleryItems.length },
@@ -342,34 +236,17 @@ export default function Galeria() {
     setUploadProgress(0)
 
     try {
-      // Simular progreso de subida
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval)
-            return 90
-          }
-          return prev + 10
-        })
-      }, 200)
+      // Subir imagen y guardar en Firestore
+      await uploadGalleryImage(uploadForm.file, {
+        title: uploadForm.title,
+        description: uploadForm.description,
+        category: uploadForm.category,
+        type: uploadForm.type,
+        author: uploadForm.author,
+        thumbnail: uploadForm.thumbnail
+      })
 
-      // Aquí iría la subida real a Firebase Storage
-      // const storageRef = ref(storage, `gallery/${Date.now()}_${uploadForm.file.name}`)
-      // const uploadTask = uploadBytesResumable(storageRef, uploadForm.file)
-      
-      // Simular tiempo de subida
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
       setUploadProgress(100)
-      
-      // Aquí iría la guardada en Firestore
-      // await addDoc(collection(db, "gallery"), {
-      //   ...uploadForm,
-      //   likes: 0,
-      //   views: 0,
-      //   date: new Date().toISOString().split('T')[0],
-      //   createdAt: serverTimestamp()
-      // })
 
       // Resetear formulario
       setUploadForm({
@@ -381,13 +258,12 @@ export default function Galeria() {
         file: null,
         thumbnail: "🌲"
       })
-      
+
       setShowUploadModal(false)
       setIsUploading(false)
       setUploadProgress(0)
-      
+
       alert("¡Tu creación se subió exitosamente!")
-      
     } catch (error) {
       console.error("Error uploading:", error)
       alert("Error al subir el archivo. Intenta de nuevo.")
@@ -560,7 +436,16 @@ export default function Galeria() {
                     <div
                       className={`w-full h-full bg-gradient-to-br ${getTypeColor(item.type)} flex items-center justify-center relative group-hover:scale-110 transition-transform duration-700`}
                     >
-                      <div className="text-5xl md:text-7xl filter drop-shadow-lg">{item.thumbnail}</div>
+                      {(item.type === "image" || item.type === "drawing") && item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          style={{ borderRadius: viewMode === "grid" ? "1.5rem 1.5rem 0 0" : "1rem" }}
+                        />
+                      ) : (
+                        <div className="text-5xl md:text-7xl filter drop-shadow-lg">{item.thumbnail}</div>
+                      )}
 
                       {/* Overlay con tipo mejorado */}
                       <div className="absolute top-3 left-3">

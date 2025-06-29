@@ -21,6 +21,13 @@ import {
   Image,
   FileText,
 } from "lucide-react"
+import apagarLucesVideo from "../assets/apagarluces.mp4";
+import cerrarGrifoVideo from "../assets/cerrarelgrifo.mp4";
+import desconectarDispositivosVideo from "../assets/desconectardispositivos.mp4";
+import plantarSemillaVideo from "../assets/plantarsemilla.mp4";
+import reutilizarBaldeVideo from "../assets/reutilizarbalde.mp4";
+import reutilizarBolsasVideo from "../assets/reutilizarbolsas.mp4";
+import separaBasuraVideo from "../assets/separabasura.mp4";
 
 export default function EcoTips() {
   const [likedTips, setLikedTips] = useState([])
@@ -55,7 +62,8 @@ export default function EcoTips() {
       difficulty: "Súper fácil",
       time: "0 segundos",
       category: "Energía",
-      videoUrl: "https://www.youtube.com/watch?v=example1"
+      videoUrl: "https://www.youtube.com/watch?v=example1",
+      videoFile: apagarLucesVideo,
     },
     {
       id: 2,
@@ -68,7 +76,8 @@ export default function EcoTips() {
       difficulty: "Fácil",
       time: "2 minutos",
       category: "Agua",
-      videoUrl: "https://www.youtube.com/watch?v=example2"
+      videoUrl: "https://www.youtube.com/watch?v=example2",
+      videoFile: cerrarGrifoVideo,
     },
     {
       id: 3,
@@ -81,19 +90,9 @@ export default function EcoTips() {
       difficulty: "Fácil",
       time: "1 minuto",
       category: "Reciclaje",
+      videoFile: separaBasuraVideo,
     },
-    {
-      id: 4,
-      title: "Camina o usa bicicleta",
-      description: "Para distancias cortas, elige caminar o andar en bici. Es saludable y no contamina.",
-      icon: Car,
-      color: "from-verdeesmeralda to-azulprofundo",
-      bgColor: "bg-emerald-50",
-      impact: "Cero emisiones de CO2",
-      difficulty: "Medio",
-      time: "Variable",
-      category: "Transporte",
-    },
+   
     {
       id: 5,
       title: "Usa bolsas reutilizables",
@@ -105,6 +104,7 @@ export default function EcoTips() {
       difficulty: "Súper fácil",
       time: "0 segundos",
       category: "Consumo",
+      videoFile: reutilizarBolsasVideo,
     },
     {
       id: 6,
@@ -117,6 +117,7 @@ export default function EcoTips() {
       difficulty: "Fácil",
       time: "5 minutos",
       category: "Naturaleza",
+      videoFile: plantarSemillaVideo,
     },
     {
       id: 7,
@@ -129,6 +130,7 @@ export default function EcoTips() {
       difficulty: "Fácil",
       time: "30 segundos",
       category: "Energía",
+      videoFile: desconectarDispositivosVideo,
     },
     {
       id: 8,
@@ -141,6 +143,7 @@ export default function EcoTips() {
       difficulty: "Medio",
       time: "5 minutos",
       category: "Reutilización",
+      videoFile: reutilizarBaldeVideo,
     },
   ]
 
@@ -339,8 +342,18 @@ export default function EcoTips() {
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => setSelectedTip(tip)}
                 >
-                  {/* Header con ícono animado */}
-                  <div className={`bg-gradient-to-r ${tip.color} p-6 text-center relative overflow-hidden`}>
+                  {/* Header con ícono animado y video de fondo si existe */}
+                  <div className={`relative ${tip.videoFile ? "" : `bg-gradient-to-r ${tip.color}`} p-6 text-center overflow-hidden rounded-t-3xl`}> 
+                    {tip.videoFile && (
+                      <video
+                        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 blur-[2px]"
+                        src={tip.videoFile}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
+                    )}
                     <div className="relative z-10">
                       <div className="w-16 h-16 bg-blanco/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-8 h-8 text-blanco group-hover:rotate-12 transition-transform duration-300" />
@@ -349,7 +362,6 @@ export default function EcoTips() {
                         {tip.category}
                       </div>
                     </div>
-
                     {/* Efecto de ondas */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   </div>
@@ -416,94 +428,6 @@ export default function EcoTips() {
         </div>
       </section>
 
-      {/* Reto de la semana */}
-      <section className="py-16 px-4 bg-gradient-to-r from-azulprofundo/10 to-verdeesmeralda/10">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-blanco rounded-3xl shadow-2xl overflow-hidden border border-verdementa/20">
-            {/* Header del reto */}
-            <div className="bg-gradient-to-r from-azulprofundo to-verdeesmeralda p-8 text-center relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/10 to-transparent animate-pulse"></div>
-
-              <div className="relative z-10">
-                <div className="w-20 h-20 bg-blanco/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                  <Trophy className="w-10 h-10 text-blanco" />
-                </div>
-                <h2 className="font-lato text-3xl md:text-4xl font-bold text-blanco mb-2">Reto de la Semana</h2>
-                <p className="font-inter text-blanco/90 text-lg">¡Acepta el desafío y comparte tu experiencia!</p>
-              </div>
-            </div>
-
-            {/* Contenido del reto */}
-            <div className="p-8">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-verdementa/20 to-verdeclaro/20 rounded-full px-6 py-3 mb-6">
-                  <Calendar className="w-5 h-5 text-verdeesmeralda" />
-                  <span className="font-lato font-semibold text-azulprofundo">Semana del 20-26 Enero</span>
-                </div>
-
-                <h3 className="font-lato text-2xl font-bold text-azulprofundo mb-4">
-                  🌱 "Planta y Documenta tu Crecimiento Verde"
-                </h3>
-
-                <p className="font-inter text-azulprofundo/80 text-lg leading-relaxed mb-6 max-w-2xl mx-auto">
-                  Planta una semilla (puede ser de frijol, lentejas, o cualquier planta) y documenta su crecimiento
-                  durante toda la semana. Toma fotos diarias y comparte tu experiencia.
-                </p>
-
-                {/* Pasos del reto */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                  <div className="bg-verdementa/10 rounded-2xl p-4">
-                    <div className="text-3xl mb-2">🌱</div>
-                    <h4 className="font-lato font-bold text-azulprofundo mb-2">Paso 1: Planta</h4>
-                    <p className="font-inter text-sm text-azulprofundo/70">Elige tu semilla y plántala con amor</p>
-                  </div>
-                  <div className="bg-verdeclaro/10 rounded-2xl p-4">
-                    <div className="text-3xl mb-2">📸</div>
-                    <h4 className="font-lato font-bold text-azulprofundo mb-2">Paso 2: Documenta</h4>
-                    <p className="font-inter text-sm text-azulprofundo/70">Toma fotos diarias del progreso</p>
-                  </div>
-                  <div className="bg-verdeesmeralda/10 rounded-2xl p-4">
-                    <div className="text-3xl mb-2">🏆</div>
-                    <h4 className="font-lato font-bold text-azulprofundo mb-2">Paso 3: Comparte</h4>
-                    <p className="font-inter text-sm text-azulprofundo/70">Sube tu evidencia y gana puntos</p>
-                  </div>
-                </div>
-
-                {/* Stats del reto */}
-                <div className="flex flex-wrap justify-center gap-6 mb-8">
-                  <div className="text-center">
-                    <div className="font-lato text-2xl font-bold text-verdeesmeralda">156</div>
-                    <div className="font-inter text-sm text-azulprofundo/70">Participantes</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-lato text-2xl font-bold text-azulprofundo">7</div>
-                    <div className="font-inter text-sm text-azulprofundo/70">Días restantes</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-lato text-2xl font-bold text-yellow-500">500</div>
-                    <div className="font-inter text-sm text-azulprofundo/70">Puntos premio</div>
-                  </div>
-                </div>
-
-                {/* Botón de participar funcional */}
-                <button 
-                  onClick={handleChallengeClick}
-                  className="bg-gradient-to-r from-verdeesmeralda to-azulprofundo hover:from-azulprofundo hover:to-verdeesmeralda text-blanco font-lato font-bold py-4 px-8 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto text-lg group"
-                >
-                  <Upload className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-                  <span>Subir mi Evidencia</span>
-                  <Camera className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
-                </button>
-
-                <p className="font-inter text-xs text-azulprofundo/60 mt-4">
-                  * Puedes subir fotos, videos o un collage de tu experiencia
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Modal detallado */}
       {selectedTip && (
         <div className="fixed inset-0 bg-negro/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedTip(null)}>
@@ -530,6 +454,11 @@ export default function EcoTips() {
             {/* Contenido del modal */}
             <div className="p-8">
               <p className="font-inter text-azulprofundo/80 leading-relaxed mb-4 text-lg">{selectedTip.description}</p>
+              {selectedTip.videoFile && (
+                <video controls className="w-full rounded-xl my-4" src={selectedTip.videoFile}>
+                  Tu navegador no soporta el video.
+                </video>
+              )}
               <div className="flex flex-wrap gap-4 mb-6">
                 <span className="inline-block px-4 py-2 rounded-full text-sm font-lato font-semibold bg-gradient-to-r from-verdementa to-verdeclaro text-blanco">
                   {selectedTip.impact}

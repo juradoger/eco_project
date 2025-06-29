@@ -17,6 +17,17 @@ import {
   ExternalLink,
   Leaf,
 } from "lucide-react"
+import bosqueImg from "../assets/bosque.png"
+import parqueImg from "../assets/parque.png"
+import jardinImg from "../assets/jardin.png"
+import rioImg from "../assets/rio.png"
+import hojaImg from "../assets/hoja.png"
+import arboliconImg from "../assets/arbolicon.png"
+import bosque1Img from "../assets/bosque_1.png"
+import pezImg from "../assets/pez.png"
+import peziconImg from "../assets/pezicon.png"
+import parque1Img from "../assets/parque_1.png"
+import jardin1Img from "../assets/jardin_1.png"
 
 export default function Explora() {
   const [gameScore, setGameScore] = useState(0)
@@ -47,28 +58,28 @@ export default function Explora() {
   // Datos para ecosistemas
   const ecosystems = [
     {
-      icon: TreePine,
+      icon: bosque1Img,
       name: "Bosques",
       description: "Pulmones verdes que purifican el aire",
-      image: "🌲",
+      image: bosqueImg,
     },
     {
-      icon: Fish,
+      icon: peziconImg,
       name: "Ríos y Lagos",
       description: "Fuentes de vida y agua dulce",
-      image: "🏞️",
+      image: rioImg,
     },
     {
-      icon: Bird,
+      icon: parque1Img,
       name: "Parques Urbanos",
       description: "Espacios verdes en la ciudad",
-      image: "🌳",
+      image: parqueImg,
     },
     {
-      icon: Flower2,
+      icon: jardin1Img,
       name: "Jardines",
       description: "Pequeños oasis de biodiversidad",
-      image: "🌺",
+      image: jardinImg,
     },
   ]
 
@@ -128,7 +139,7 @@ export default function Explora() {
           <h1 className="italic text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_6px_32px_rgba(44,180,120,0.25)] tracking-wide transition-transform duration-300 hover:scale-110 cursor-pointer" style={{ fontFamily: 'var(--font-pacifico)' }}>
             <span className="inline-block animate-bounce-slow align-middle mr-3">
               <span className="inline-flex items-center justify-center w-16 h-16 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-verdementa to-verdeesmeralda shadow-lg">
-                <Leaf className="w-10 h-10 md:w-16 md:h-16 text-white" />
+                <img src={hojaImg} alt="Hoja icon" className="w-10 h-10 md:w-16 md:h-16 object-contain filter brightness-0 invert" />
               </span>
             </span>
             Explora y Aprende
@@ -214,8 +225,11 @@ export default function Explora() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="italic text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_4px_24px_rgba(44,180,120,0.18)] tracking-wider" style={{ fontFamily: 'var(--font-pacifico)' }}>
-              🌿 Ecosistemas que Protegemos
+            <h2 className="italic text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_4px_24px_rgba(44,180,120,0.18)] tracking-wider flex items-center justify-center gap-3" style={{ fontFamily: 'var(--font-pacifico)' }}>
+              <span className="inline-flex items-center justify-center w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-verdementa to-verdeesmeralda shadow-lg">
+                <img src={arboliconImg} alt="Ecosistemas que Protegemos" className="w-16 h-16 md:w-24 md:h-24 object-contain filter brightness-0 invert" />
+              </span>
+              Ecosistemas que Protegemos
             </h2>
             <p className="font-inter text-lg text-azulprofundo/80">
               Cada espacio natural es un tesoro que debemos cuidar
@@ -224,30 +238,24 @@ export default function Explora() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {ecosystems.map((ecosystem, index) => {
-              const IconComponent = ecosystem.icon
               return (
                 <div
                   key={index}
                   className="bg-blanco rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2 border border-verdeclaro/20 animate-fade-in group"
                 >
                   {/* Imagen del ecosistema */}
-                  <div className="h-40 bg-gradient-to-br from-verdeclaro to-verdementa flex items-center justify-center animate-float group-hover:scale-110 transition-transform duration-300">
-                    {/* 
-                    CÓMO CAMBIAR ESTAS IMÁGENES:
-                    Reemplaza este div con:
+                  <div className="h-40 bg-gradient-to-br from-verdeclaro to-verdementa flex items-center justify-center animate-float group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                     <img 
-                      src="/ruta/a/tu/foto-${ecosystem.name.toLowerCase()}.jpg" 
+                      src={ecosystem.image} 
                       alt={ecosystem.name}
-                      className="w-full h-40 object-cover"
+                      className="w-full h-full object-cover"
                     />
-                    */}
-                    <div className="text-6xl animate-pop-slow">{ecosystem.image}</div>
                   </div>
 
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-verdeesmeralda to-verdeclaro rounded-full flex items-center justify-center animate-float group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="w-5 h-5 text-white filter grayscale group-hover:grayscale-0 group-hover:text-blanco transition-all duration-300 animate-pop" />
+                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-verdementa to-verdeesmeralda rounded-full flex items-center justify-center animate-float group-hover:scale-110 transition-transform duration-300 border-4 border-white shadow-lg">
+                        <img src={ecosystem.icon} alt={ecosystem.name + ' icon'} className="w-8 h-8 md:w-14 md:h-14 object-contain filter brightness-0 invert" />
                       </div>
                       <h3 className="font-lato text-lg font-bold text-azulprofundo animate-fade-in">
                         {ecosystem.name}
@@ -267,7 +275,7 @@ export default function Explora() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="italic text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_4px_24px_rgba(44,180,120,0.18)] tracking-wider" style={{ fontFamily: 'var(--font-pacifico)' }}>
-              ⚠️ Amenazas que Debemos Vigilar
+              Amenazas que Debemos Vigilar
             </h2>
             <p className="font-inter text-lg text-azulprofundo/80">
               Conocer los problemas es el primer paso para solucionarlos
@@ -294,89 +302,6 @@ export default function Explora() {
                 </div>
               )
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Juego visual: Encuentra el problema */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="italic text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_4px_24px_rgba(44,180,120,0.18)] tracking-wider" style={{ fontFamily: 'var(--font-pacifico)' }}>
-              🎯 Encuentra el Problema en la Imagen
-            </h2>
-            <p className="font-inter text-lg text-azulprofundo/80 mb-4">
-              Haz clic en los elementos que están dañando el medio ambiente
-            </p>
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="bg-verdementa text-blanco px-4 py-2 rounded-full font-lato font-semibold">
-                Puntuación: {gameScore}
-              </div>
-              <div className="bg-azulprofundo text-blanco px-4 py-2 rounded-full font-lato font-semibold">
-                Encontrados: {foundProblems.length}/4
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-blanco rounded-3xl p-8 shadow-xl">
-            <div className="relative aspect-video bg-gradient-to-br from-verdeclaro/20 to-verdementa/20 rounded-2xl overflow-hidden cursor-crosshair">
-              {/* 
-              CÓMO CAMBIAR ESTA IMAGEN:
-              Reemplaza este div con:
-              <img 
-                src="/ruta/a/tu/imagen-juego-problemas.jpg" 
-                alt="Encuentra los problemas ambientales"
-                className="w-full h-full object-cover"
-              />
-              */}
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-verdeclaro/30 to-verdementa/30">
-                <div className="text-center text-azulprofundo">
-                  <Search className="w-16 h-16 mx-auto mb-4" />
-                  <p className="font-lato text-xl font-semibold">Imagen Interactiva</p>
-                  <p className="font-inter text-sm">Haz clic para encontrar problemas</p>
-                </div>
-              </div>
-
-              {/* Puntos clicables */}
-              {gameProblems.map((problem) => (
-                <button
-                  key={problem.id}
-                  onClick={() => handleProblemClick(problem.id, problem.name)}
-                  className={`absolute w-6 h-6 rounded-full border-2 transition-all duration-300 ${
-                    foundProblems.includes(problem.id)
-                      ? "bg-green-500 border-green-600 scale-125"
-                      : "bg-red-500 border-red-600 hover:scale-110 animate-pulse"
-                  }`}
-                  style={{ left: `${problem.x}%`, top: `${problem.y}%` }}
-                  title={problem.name}
-                >
-                  {foundProblems.includes(problem.id) ? (
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-white" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Resultados del juego */}
-            {foundProblems.length === gameProblems.length && (
-              <div className="mt-6 text-center">
-                <div className="bg-gradient-to-r from-verdementa to-verdeclaro text-blanco p-6 rounded-2xl">
-                  <h3 className="font-lato text-2xl font-bold mb-2">¡Felicitaciones! 🎉</h3>
-                  <p className="font-inter">Has encontrado todos los problemas ambientales</p>
-                  <button
-                    onClick={() => {
-                      setFoundProblems([])
-                      setGameScore(0)
-                    }}
-                    className="mt-4 bg-blanco text-verdeesmeralda px-6 py-2 rounded-full font-lato font-semibold hover:scale-105 transition-transform"
-                  >
-                    Jugar de nuevo
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>

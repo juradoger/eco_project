@@ -9,6 +9,9 @@ import Misiones from '../pages/misiones';
 import Galeria from '../pages/galeria';
 import EcoTips from '../pages/ecotips';
 import Participa from '../pages/participar';
+
+
+
 function Rutas(){
     return(
         <Router>
@@ -21,6 +24,7 @@ function Rutas(){
                 <Route path="/ecotips" element={<EcoTips />} />
                 <Route path="/participar" element={<Participa/>}/>
                 <Route path="/cards" element={<Card />} />    
+               
             </Routes>
             <Footer />
         </Router>

@@ -1,5 +1,8 @@
 import { useState } from "react"
 import { Play, Star, Trophy, Zap, Sparkles, ArrowRight, Clock, Users, Award, CheckCircle } from "lucide-react"
+import avionImg from "../assets/avion.png"
+import reciclajeImg from "../assets/reciclaje.png"
+import lupaImg from "../assets/lupa.png"
 
 export default function Misiones() {
   const [hoveredCard, setHoveredCard] = useState(null)
@@ -12,7 +15,7 @@ export default function Misiones() {
       title: "Clasificador Maestro",
       subtitle: "Separar residuos",
       description: "Arrastra cada objeto al contenedor correcto y conviértete en un experto del reciclaje",
-      icon: "♻️",
+      icon: reciclajeImg,
       difficulty: "Fácil",
       time: "5 min",
       points: 100,
@@ -27,7 +30,7 @@ export default function Misiones() {
       title: "Detective Verde",
       subtitle: "Detectar contaminación",
       description: "Encuentra todos los elementos que dañan el medio ambiente en esta imagen misteriosa",
-      icon: "🔍",
+      icon: lupaImg,
       difficulty: "Medio",
       time: "8 min",
       points: 150,
@@ -36,66 +39,6 @@ export default function Misiones() {
       color: "from-verdeesmeralda to-azulprofundo",
       bgPattern: "🕵️‍♀️🌍🔎",
       category: "Juego Digital",
-    },
-    {
-      id: 3,
-      title: "Jardinero Heroico",
-      subtitle: "Plantar semillas",
-      description: "Planta una semilla real y documenta su crecimiento día a día",
-      icon: "🌱",
-      difficulty: "Fácil",
-      time: "30 días",
-      points: 200,
-      players: "2.1k",
-      type: "real",
-      color: "from-verdeclaro to-verdementa",
-      bgPattern: "🌱🌿🌳",
-      category: "Actividad Real",
-    },
-    {
-      id: 4,
-      title: "Limpieza Épica",
-      subtitle: "Limpiar espacios",
-      description: "Organiza una limpieza en tu barrio, parque o playa y comparte tu experiencia",
-      icon: "🧹",
-      difficulty: "Medio",
-      time: "2 horas",
-      points: 250,
-      players: "634",
-      type: "real",
-      color: "from-azulprofundo to-verdeesmeralda",
-      bgPattern: "🧹✨🏞️",
-      category: "Actividad Real",
-    },
-    {
-      id: 5,
-      title: "Creador Genial",
-      subtitle: "Reutilizar objetos",
-      description: "Transforma objetos usados en algo nuevo y útil con tu creatividad",
-      icon: "🎨",
-      difficulty: "Difícil",
-      time: "1 hora",
-      points: 300,
-      players: "423",
-      type: "real",
-      color: "from-verdementa to-azulprofundo",
-      bgPattern: "🎨♻️✂️",
-      category: "Actividad Real",
-    },
-    {
-      id: 6,
-      title: "Guardián del Agua",
-      subtitle: "Ahorrar agua",
-      description: "Implementa técnicas de ahorro de agua en casa y mide tu impacto",
-      icon: "💧",
-      difficulty: "Fácil",
-      time: "1 semana",
-      points: 180,
-      players: "1.5k",
-      type: "real",
-      color: "from-verdeclaro to-verdeesmeralda",
-      bgPattern: "💧🚿🌊",
-      category: "Actividad Real",
     },
   ]
 
@@ -149,9 +92,10 @@ export default function Misiones() {
             <Sparkles className="w-7 h-7 animate-pulse" />
           </div>
 
-          <h1 className="font-lato text-6xl md:text-8xl font-bold mb-8 leading-tight relative">
+          <h1 className="font-lato text-6xl md:text-8xl font-bold mb-8 leading-tight relative flex items-center justify-center gap-4">
+            <img src={avionImg} alt="Avión" className="w-16 h-16 md:w-24 md:h-24 object-contain animate-bounce" />
             <span className="bg-gradient-to-r from-verdementa via-verdeesmeralda to-azulprofundo bg-clip-text text-transparent animate-pulse">
-              🚀 ¡Misiones Ecológicas!
+              ¡Misiones Ecológicas!
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent animate-pulse opacity-50 blur-sm"></div>
           </h1>
@@ -217,7 +161,16 @@ export default function Misiones() {
 
                   {/* Header con gradiente mejorado */}
                   <div className={`bg-gradient-to-r ${mission.color} p-10 text-center relative overflow-hidden`}>
-                    <div className="text-7xl mb-6 animate-bounce filter drop-shadow-lg">{mission.icon}</div>
+                    <div className="text-7xl mb-6 animate-bounce filter drop-shadow-lg">
+                      {typeof mission.icon === "string" && /\\.(png|jpe?g|svg|webp)$/.test(mission.icon)
+                        ? (
+                          <img src={mission.icon} alt={mission.title + ' icon'} className="w-16 h-16 md:w-20 md:h-20 object-contain" />
+                        )
+                        : (typeof mission.icon === "string" && mission.icon.length <= 3)
+                          ? <span className="text-5xl md:text-6xl">{mission.icon}</span>
+                          : <img src={mission.icon} alt={mission.title + ' icon'} className="w-16 h-16 md:w-20 md:h-20 object-contain" />
+                      }
+                    </div>
                     <h3 className="font-lato text-3xl font-bold text-blanco mb-3 drop-shadow-lg">{mission.title}</h3>
                     <p className="font-inter text-blanco/95 text-lg font-semibold">{mission.subtitle}</p>
 
