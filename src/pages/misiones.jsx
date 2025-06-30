@@ -3,6 +3,8 @@ import { Play, Star, Trophy, Zap, Sparkles, ArrowRight, Clock, Users, Award, Che
 import avionImg from "../assets/avion.png"
 import reciclajeImg from "../assets/reciclaje.png"
 import lupaImg from "../assets/lupa.png"
+import separaImg from "../assets/Separa.jpeg"
+import lagolimpioImg from "../assets/lagolimpio.jpeg"
 import SepararBasuraGame from "../components/SepararBasuraGame"
 import LagoLimpioGame from "../components/LagoLimpioGame"
 
@@ -19,6 +21,7 @@ export default function Misiones() {
       subtitle: "Clasifica los residuos",
       description: "Arrastra cada residuo al contenedor correcto y conviértete en un héroe del reciclaje.",
       icon: reciclajeImg,
+      coverImage: separaImg,
       difficulty: "Fácil",
       time: "5 min",
       points: 100,
@@ -35,6 +38,7 @@ export default function Misiones() {
       subtitle: "Elimina la contaminación",
       description: "Encuentra y elimina los elementos contaminantes del lago para proteger la naturaleza.",
       icon: lupaImg,
+      coverImage: lagolimpioImg,
       difficulty: "Medio",
       time: "8 min",
       points: 150,
@@ -174,20 +178,23 @@ export default function Misiones() {
                     </div>
                   </div>
 
-                  {/* Header con gradiente mejorado */}
-                  <div className={`bg-gradient-to-r ${mission.color} p-10 text-center relative overflow-hidden`}>
-                    <div className="text-7xl mb-6 animate-bounce filter drop-shadow-lg">
-                      {typeof mission.icon === "string" && /\\.(png|jpe?g|svg|webp)$/.test(mission.icon)
-                        ? (
-                          <img src={mission.icon} alt={mission.title + ' icon'} className="w-16 h-16 md:w-20 md:h-20 object-contain" />
-                        )
-                        : (typeof mission.icon === "string" && mission.icon.length <= 3)
-                          ? <span className="text-5xl md:text-6xl">{mission.icon}</span>
-                          : <img src={mission.icon} alt={mission.title + ' icon'} className="w-16 h-16 md:w-20 md:h-20 object-contain" />
-                      }
+                  {/* Header con imagen de portada */}
+                  <div className="relative h-48 overflow-hidden">
+                    {/* Imagen de portada */}
+                    <img 
+                      src={mission.coverImage} 
+                      alt={mission.title + ' portada'} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    
+                    {/* Overlay gradiente para mejorar legibilidad del texto */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    
+                    {/* Título y subtítulo sobre la imagen */}
+                    <div className="absolute bottom-4 left-4 right-4 text-blanco">
+                      <h3 className="font-lato text-2xl font-bold mb-1 drop-shadow-lg">{mission.title}</h3>
+                      <p className="font-inter text-blanco/95 text-sm font-semibold">{mission.subtitle}</p>
                     </div>
-                    <h3 className="font-lato text-3xl font-bold text-blanco mb-3 drop-shadow-lg">{mission.title}</h3>
-                    <p className="font-inter text-blanco/95 text-lg font-semibold">{mission.subtitle}</p>
 
                     {/* Efectos de brillo mejorados */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500"></div>

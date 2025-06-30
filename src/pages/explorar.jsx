@@ -28,6 +28,7 @@ import pezImg from "../assets/pez.png"
 import peziconImg from "../assets/pezicon.png"
 import parque1Img from "../assets/parque_1.png"
 import jardin1Img from "../assets/jardin_1.png"
+import videoOLAF from "../assets/videoOLAF.mp4"
 
 export default function Explora() {
   const [gameScore, setGameScore] = useState(0)
@@ -193,29 +194,21 @@ export default function Explora() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="italic text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-azulprofundo via-verdeesmeralda to-verdementa bg-clip-text text-transparent animate-gradient-move drop-shadow-[0_4px_24px_rgba(44,180,120,0.18)] tracking-wider" style={{ fontFamily: 'var(--font-pacifico)' }}>
-              Respira Verde
+              Conoce ecotips
             </h2>
-            <p className="font-inter text-lg text-azulprofundo/80">Cuidando nuestro aire, agua y tierra</p>
+            <p className="font-inter text-lg text-azulprofundo/80">Descubre consejos para cuidar el medio ambiente</p>
           </div>
 
           <div className="bg-blanco rounded-3xl p-8 shadow-xl">
             <div className="aspect-video bg-gradient-to-br from-verdementa to-verdeclaro rounded-2xl flex items-center justify-center relative overflow-hidden">
-              {/* 
-              CÓMO CAMBIAR ESTE VIDEO:
-              Reemplaza este div con:
               <video 
                 controls 
                 className="w-full h-full object-cover rounded-2xl"
                 poster="/ruta/a/tu/thumbnail.jpg"
               >
-                <source src="/ruta/a/tu/video-respira-verde.mp4" type="video/mp4" />
+                <source src={videoOLAF} type="video/mp4" />
+                Tu navegador no soporta el elemento de video.
               </video>
-              */}
-              <div className="text-center text-blanco">
-                <Play className="w-16 h-16 mx-auto mb-4 opacity-80" />
-                <p className="font-lato text-xl font-semibold">Video: Respira Verde</p>
-                <p className="font-inter text-sm opacity-90">Cuidando nuestro aire, agua y tierra</p>
-              </div>
             </div>
           </div>
         </div>
