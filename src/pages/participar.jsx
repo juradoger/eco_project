@@ -1,4 +1,6 @@
-import { useState, useRef } from "react"
+"use client"
+
+import { useState, useRef, useEffect } from "react"
 import {
   User,
   Upload,
@@ -7,7 +9,6 @@ import {
   Trophy,
   Medal,
   Crown,
-  Star,
   Camera,
   Video,
   CheckCircle,
@@ -23,13 +24,14 @@ import {
   Users,
   Award,
   Target,
-  Clock,
   Edit,
   X,
   Plus,
   Save,
+  LogOut,
+  LogIn,
 } from "lucide-react"
-import userService from '../services/user-service'
+import userService from "../services/user-service"
 
 export default function Participa() {
   const [formData, setFormData] = useState({
@@ -41,98 +43,108 @@ export default function Participa() {
   const [submitStatus, setSubmitStatus] = useState(null)
   const [dragActive, setDragActive] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [loginError, setLoginError] = useState("")
+  const [loginName, setLoginName] = useState("")
   const fileInputRef = useRef(null)
 
   // Estado del perfil del usuario
-  const [userProfile, setUserProfile] = useState({
-    name: "",
-    nickname: "",
-    avatar: "🦸‍♀️",
-    isProfileComplete: false
-  })
+  const [userProfile, setUserProfile] = useState(() => {
+    // Intentar cargar de localStorage
+    const stored = localStorage.getItem('userProfile');
+    return stored
+      ? JSON.parse(stored)
+      : {
+          name: "",
+          nickname: "",
+          avatar: "🦸‍♀️",
+          isProfileComplete: false,
+          isLoggedIn: false,
+          userId: null,
+        };
+  });
 
-  // Datos del ranking actualizado con tiempo estimado
-  const ranking = [
-    {
-      id: 1,
-      nombre: "EcoHéroe María",
-      puntos: 2850,
-      avatar: "👧",
-      nivel: "Guardián Verde",
-      estimatedTime: "1 min 30 s",
-      posicion: 1,
-    },
-    {
-      id: 2,
-      nombre: "Detective Carlos",
-      puntos: 2640,
-      avatar: "👦",
-      nivel: "Protector Planeta",
-      estimatedTime: "2 min 15 s",
-      posicion: 2,
-    },
-    {
-      id: 3,
-      nombre: "Capitana Ana",
-      puntos: 2420,
-      avatar: "👩",
-      nivel: "Salvadora Tierra",
-      estimatedTime: "1 min 45 s",
-      posicion: 3,
-    },
-    {
-      id: 4,
-      nombre: "Ranger Luis",
-      puntos: 2180,
-      avatar: "🧒",
-      nivel: "Defensor Verde",
-      estimatedTime: "3 min 20 s",
-      posicion: 4,
-    },
-    {
-      id: 5,
-      nombre: "Scout Sofia",
-      puntos: 1950,
-      avatar: "👧",
-      nivel: "Eco Aventurera",
-      estimatedTime: "2 min 50 s",
-      posicion: 5,
-    },
-    {
-      id: 6,
-      nombre: "Ninja Diego",
-      puntos: 1720,
-      avatar: "👦",
-      nivel: "Guerrero Eco",
-      estimatedTime: "4 min 10 s",
-      posicion: 6,
-    },
-    {
-      id: 7,
-      nombre: "Maga Emma",
-      puntos: 1580,
-      avatar: "👩",
-      nivel: "Hechicera Verde",
-      estimatedTime: "2 min 30 s",
-      posicion: 7,
-    },
-    {
-      id: 8,
-      nombre: "Explorador Pablo",
-      puntos: 1340,
-      avatar: "🧒",
-      nivel: "Buscador Eco",
-      estimatedTime: "3 min 45 s",
-      posicion: 8,
-    },
-  ]
+  // Guardar en localStorage cada vez que cambia el perfil
+  useEffect(() => {
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+  }, [userProfile]);
+
+  // Datos del ranking - ahora se cargan desde Firebase
+  const [ranking, setRanking] = useState([])
+  const [loadingRanking, setLoadingRanking] = useState(true)
 
   // Avatares disponibles
   const availableAvatars = [
-    "🦸‍♀️", "🦸‍♂️", "👧", "👦", "👩", "👨", "🧒", "🧑", 
-    "🐱", "🐶", "🦋", "🦜", "🐸", "🦊", "🐼", "🦁"
+    "🦸‍♀️",
+    "🦸‍♂️",
+    "👧",
+    "👦",
+    "👩",
+    "👨",
+    "🧒",
+    "🧑",
+    "🐱",
+    "🐶",
+    "🦋",
+    "🦜",
+    "🐸",
+    "🦊",
+    "🐼",
+    "🦁",
   ]
+
+  // Cargar ranking desde Firebase
+  useEffect(() => {
+    loadRanking()
+  }, [])
+
+  const loadRanking = async () => {
+    try {
+      setLoadingRanking(true)
+      const usuarios = await userService.getAll()
+
+      // Filtrar solo usuarios con nickname y score, y ordenar por score
+      const usuariosRanking = usuarios
+        .filter((user) => user.nickname && typeof user.score === "number")
+        .sort((a, b) => b.score - a.score)
+        .map((user, index) => {
+          // Procesar minijuegos
+          let resumenMinijuegos = [
+            { nombre: 'separar-basura', maxEstrellas: 2, mejorTiempo: NaN },
+            { nombre: 'lago-limpio', maxEstrellas: 2, mejorTiempo: NaN },
+          ];
+          // Si el usuario tiene resultados reales, reemplaza los predeterminados
+          if (user.minigames) {
+            resumenMinijuegos = Object.entries(user.minigames).map(([nombre, partidas]) => {
+              if (!Array.isArray(partidas) || partidas.length === 0) return null;
+              const mejorTiempo = Math.min(...partidas.map(p => p.tiempo ?? Infinity));
+              const maxEstrellas = Math.max(...partidas.map(p => p.estrellas ?? 0));
+              return { nombre, mejorTiempo, maxEstrellas };
+            }).filter(Boolean);
+            // Si falta algún minijuego, agrega el predeterminado
+            if (!resumenMinijuegos.find(j => j.nombre === 'separar-basura'))
+              resumenMinijuegos.push({ nombre: 'separar-basura', maxEstrellas: 2, mejorTiempo: NaN });
+            if (!resumenMinijuegos.find(j => j.nombre === 'lago-limpio'))
+              resumenMinijuegos.push({ nombre: 'lago-limpio', maxEstrellas: 2, mejorTiempo: NaN });
+          }
+          return {
+            id: user.id,
+            nombre: user.nickname,
+            puntos: user.score,
+            avatar: user.avatar || "🦸‍♀️",
+            posicion: index + 1,
+            resumenMinijuegos,
+          };
+        })
+
+      setRanking(usuariosRanking)
+    } catch (error) {
+      console.error("Error al cargar ranking:", error)
+    } finally {
+      setLoadingRanking(false)
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -177,8 +189,8 @@ export default function Participa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    if (!userProfile.isProfileComplete) {
+
+    if (!userProfile.isProfileComplete && !userProfile.isLoggedIn) {
       setShowProfileModal(true)
       return
     }
@@ -202,18 +214,80 @@ export default function Participa() {
     if (userProfile.name && userProfile.nickname) {
       // Guardar usuario en Firebase con score 0
       try {
-        await userService.create({
+        const userId = await userService.create({
           name: userProfile.name,
           nickname: userProfile.nickname,
           avatar: userProfile.avatar,
-          score: 0
+          score: 0,
         })
+        const newProfile = {
+          ...userProfile,
+          isProfileComplete: true,
+          userId: userId,
+        }
+        setUserProfile(newProfile)
+        localStorage.setItem('userProfile', JSON.stringify(newProfile))
+        setShowProfileModal(false)
+        // Recargar ranking para mostrar el nuevo usuario
+        loadRanking()
       } catch (error) {
-        console.error('Error al guardar usuario en Firebase:', error)
+        console.error("Error al guardar usuario en Firebase:", error)
       }
-      setUserProfile(prev => ({ ...prev, isProfileComplete: true }))
-      setShowProfileModal(false)
     }
+  }
+
+  const handleLogin = async () => {
+    if (!loginName.trim()) {
+      setLoginError("Por favor ingresa tu nombre")
+      return
+    }
+
+    try {
+      setLoginError("")
+      const usuarios = await userService.getAll()
+
+      // Buscar usuario por nombre
+      const usuario = usuarios.find((user) => user.name && user.name.toLowerCase() === loginName.toLowerCase())
+
+      if (usuario) {
+        // Usuario encontrado, iniciar sesión
+        setUserProfile({
+          name: usuario.name,
+          nickname: usuario.nickname,
+          avatar: usuario.avatar || "🦸‍♀️",
+          isProfileComplete: true,
+          isLoggedIn: true,
+          userId: usuario.id,
+        })
+        localStorage.setItem('userProfile', JSON.stringify({
+          name: usuario.name,
+          nickname: usuario.nickname,
+          avatar: usuario.avatar || "🦸‍♀️",
+          isProfileComplete: true,
+          isLoggedIn: true,
+          userId: usuario.id,
+        }))
+        setShowLoginModal(false)
+        setLoginName("")
+      } else {
+        setLoginError("Usuario no existe. Verifica el nombre ingresado.")
+      }
+    } catch (error) {
+      console.error("Error al buscar usuario:", error)
+      setLoginError("Error al buscar usuario. Intenta nuevamente.")
+    }
+  }
+
+  const handleLogout = () => {
+    setUserProfile({
+      name: "",
+      nickname: "",
+      avatar: "🦸‍♀️",
+      isProfileComplete: false,
+      isLoggedIn: false,
+      userId: null,
+    })
+    localStorage.removeItem('userProfile')
   }
 
   const getRankIcon = (posicion) => {
@@ -240,13 +314,6 @@ export default function Participa() {
       default:
         return "from-verdementa to-verdeclaro"
     }
-  }
-
-  const getTimeColor = (time) => {
-    const minutes = parseInt(time.split(' ')[0])
-    if (minutes <= 2) return "bg-green-100 text-green-700"
-    if (minutes <= 3) return "bg-yellow-100 text-yellow-700"
-    return "bg-red-100 text-red-700"
   }
 
   return (
@@ -290,7 +357,7 @@ export default function Participa() {
             <div className="bg-blanco rounded-full px-6 py-3 shadow-lg border border-verdementa/20 animate-bounce">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-verdeesmeralda" />
-                <span className="font-lato font-semibold text-azulprofundo">+500 Participantes</span>
+                <span className="font-lato font-semibold text-azulprofundo">+{ranking.length} Participantes</span>
               </div>
             </div>
             <div
@@ -324,7 +391,7 @@ export default function Participa() {
               </div>
 
               <div className="p-6">
-                {userProfile.isProfileComplete ? (
+                {userProfile.isProfileComplete || userProfile.isLoggedIn ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="text-4xl animate-bounce">{userProfile.avatar}</div>
@@ -333,25 +400,47 @@ export default function Participa() {
                         <p className="font-inter text-azulprofundo/70">@{userProfile.nickname}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => setShowProfileModal(true)}
-                      className="p-3 bg-verdeclaro/20 hover:bg-verdeclaro/40 rounded-full transition-all duration-300 transform hover:scale-110"
-                    >
-                      <Edit className="w-5 h-5 text-azulprofundo" />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowProfileModal(true)}
+                        className="p-3 bg-verdeclaro/20 hover:bg-verdeclaro/40 rounded-full transition-all duration-300 transform hover:scale-110"
+                      >
+                        <Edit className="w-5 h-5 text-azulprofundo" />
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="p-3 bg-red-100 hover:bg-red-200 rounded-full transition-all duration-300 transform hover:scale-110"
+                        title="Cerrar sesión"
+                      >
+                        <LogOut className="w-5 h-5 text-red-600" />
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <div className="text-6xl mb-4">🦸‍♀️</div>
-                    <h3 className="font-lato font-bold text-azulprofundo text-lg mb-2">¡Crea tu perfil!</h3>
-                    <p className="font-inter text-azulprofundo/70 mb-4">Personaliza tu identidad de detective ecológico</p>
-                    <button
-                      onClick={() => setShowProfileModal(true)}
-                      className="bg-gradient-to-r from-verdementa to-verdeclaro text-blanco font-lato font-bold py-3 px-6 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 mx-auto"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Crear Perfil
-                    </button>
+                    <h3 className="font-lato font-bold text-azulprofundo text-lg mb-2">
+                      ¡Crea tu perfil o inicia sesión!
+                    </h3>
+                    <p className="font-inter text-azulprofundo/70 mb-4">
+                      Personaliza tu identidad de detective ecológico
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={() => setShowProfileModal(true)}
+                        className="bg-gradient-to-r from-verdementa to-verdeclaro text-blanco font-lato font-bold py-3 px-6 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Crear Perfil
+                      </button>
+                      <button
+                        onClick={() => setShowLoginModal(true)}
+                        className="bg-gradient-to-r from-azulprofundo to-verdeesmeralda text-blanco font-lato font-bold py-3 px-6 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                      >
+                        <LogIn className="w-5 h-5" />
+                        Abrir Perfil
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -511,47 +600,85 @@ export default function Participa() {
               </div>
 
               <div className="p-6 max-h-96 overflow-y-auto">
-                <div className="space-y-3">
-                  {ranking.map((detective, index) => (
-                    <div
-                      key={detective.id}
-                      className={`group relative bg-gradient-to-r ${getRankColor(detective.posicion)}/10 hover:${getRankColor(detective.posicion)}/20 rounded-2xl p-4 transition-all duration-500 hover:scale-105 hover:shadow-lg cursor-pointer border border-transparent hover:border-white/50`}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Posición y avatar */}
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-12 h-12 bg-gradient-to-r ${getRankColor(detective.posicion)} rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}
-                          >
-                            {getRankIcon(detective.posicion)}
-                          </div>
-                          <div className="text-3xl group-hover:scale-110 transition-transform duration-500">
-                            {detective.avatar}
-                          </div>
-                        </div>
-
-                        {/* Información */}
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-lato font-bold text-azulprofundo group-hover:text-verdeesmeralda transition-colors duration-300">
-                              {detective.nombre}
-                            </h3>
-                            <div className="flex items-center gap-1">
-                              <Zap className="w-4 h-4 text-yellow-500" />
-                              <span className="font-lato font-bold text-azulprofundo">
-                                {detective.puntos.toLocaleString()}
-                              </span>
+                {loadingRanking ? (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 border-4 border-verdementa/30 border-t-verdementa rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="font-inter text-azulprofundo/70">Cargando ranking...</p>
+                  </div>
+                ) : ranking.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-6xl mb-4">🏆</div>
+                    <p className="font-lato font-semibold text-azulprofundo mb-2">¡Sé el primero!</p>
+                    <p className="font-inter text-azulprofundo/70">Aún no hay detectives en el ranking</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {ranking.map((detective, index) => (
+                      <div
+                        key={detective.id}
+                        className={`group relative bg-gradient-to-r ${getRankColor(detective.posicion)}/10 hover:${getRankColor(detective.posicion)}/20 rounded-2xl p-4 transition-all duration-500 hover:scale-105 hover:shadow-lg cursor-pointer border border-transparent hover:border-white/50`}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Posición y avatar */}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-12 h-12 bg-gradient-to-r ${getRankColor(detective.posicion)} rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}
+                            >
+                              {getRankIcon(detective.posicion)}
+                            </div>
+                            <div className="text-3xl group-hover:scale-110 transition-transform duration-500">
+                              {detective.avatar}
                             </div>
                           </div>
-                        </div>
-                      </div>
 
-                      {/* Efecto de brillo */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl"></div>
-                    </div>
-                  ))}
-                </div>
+                          {/* Información */}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-lato font-bold text-azulprofundo group-hover:text-verdeesmeralda transition-colors duration-300">
+                                {detective.nombre}
+                              </h3>
+                              <div className="flex items-center gap-1">
+                                <Zap className="w-4 h-4 text-yellow-500" />
+                                <span className="font-lato font-bold text-azulprofundo">
+                                  {detective.puntos.toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                            {/* Mostrar resumen de minijuegos */}
+                            {detective.resumenMinijuegos && detective.resumenMinijuegos.length > 0 && (
+                              <div className="flex flex-col gap-1 mt-1">
+                                {detective.resumenMinijuegos.map((juego, idx) => (
+                                  <div key={juego.nombre + idx} className="flex items-center gap-2 text-sm text-azulprofundo/80">
+                                    {/* Nombre del minijuego */}
+                                    <span className="font-bold capitalize">{juego.nombre.replace(/-/g, ' ')}</span>
+                                    {/* Estrellas */}
+                                    <span className="flex items-center">
+                                      {Array.from({ length: juego.maxEstrellas }).map((_, i) => (
+                                        <span key={i} className="text-yellow-400 text-lg">★</span>
+                                      ))}
+                                      {Array.from({ length: 3 - juego.maxEstrellas }).map((_, i) => (
+                                        <span key={i} className="text-gray-300 text-lg">★</span>
+                                      ))}
+                                    </span>
+                                    {/* Mejor tiempo */}
+                                    <span className="flex items-center gap-1">
+                                      <span role="img" aria-label="reloj">⏱</span>
+                                      {isFinite(juego.mejorTiempo) ? `${juego.mejorTiempo}s` : '--'}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Efecto de brillo */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl"></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -655,7 +782,8 @@ export default function Participa() {
                     <Heart className="w-8 h-8 text-red-500 mx-auto mb-3 animate-pulse" />
                     <p className="font-lato font-semibold text-azulprofundo mb-2">¡Únete a nuestra comunidad!</p>
                     <p className="font-inter text-sm text-azulprofundo/70">
-                      Más de 10,000 eco-detectives ya forman parte de nuestra familia verde
+                      Más de {ranking.length > 0 ? ranking.length * 100 : 1000} eco-detectives ya forman parte de
+                      nuestra familia verde
                     </p>
                   </div>
                 </div>
@@ -664,6 +792,74 @@ export default function Participa() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Login */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-negro/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-blanco rounded-3xl max-w-md w-full shadow-3xl border-2 border-verdementa/20">
+            <div className="flex items-center justify-between p-6 border-b border-verdeclaro/20">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-azulprofundo to-verdeesmeralda text-blanco p-3 rounded-full">
+                  <LogIn className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="font-lato text-2xl font-bold text-azulprofundo">Abrir Perfil</h2>
+                  <p className="font-inter text-azulprofundo/70">Inicia sesión con tu nombre</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowLoginModal(false)
+                  setLoginError("")
+                  setLoginName("")
+                }}
+                className="p-3 bg-verdeclaro/20 hover:bg-verdeclaro/40 rounded-full transition-all duration-300 transform hover:scale-110"
+              >
+                <X className="w-6 h-6 text-azulprofundo" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block font-lato font-bold text-azulprofundo mb-3">Tu Nombre</label>
+                <input
+                  type="text"
+                  value={loginName}
+                  onChange={(e) => {
+                    setLoginName(e.target.value)
+                    setLoginError("")
+                  }}
+                  placeholder="Ingresa tu nombre completo"
+                  className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
+                  onKeyPress={(e) => e.key === "Enter" && handleLogin()}
+                />
+                {loginError && <p className="text-red-500 text-sm mt-2 font-inter">{loginError}</p>}
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={() => {
+                    setShowLoginModal(false)
+                    setLoginError("")
+                    setLoginName("")
+                  }}
+                  className="flex-1 bg-verdeclaro/20 hover:bg-verdeclaro/40 text-azulprofundo font-lato font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleLogin}
+                  disabled={!loginName.trim()}
+                  className="flex-1 bg-gradient-to-r from-azulprofundo to-verdeesmeralda text-blanco font-lato font-bold py-4 px-8 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                >
+                  <LogIn className="w-5 h-5" />
+                  <span>Iniciar Sesión</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Perfil */}
       {showProfileModal && (
@@ -695,7 +891,7 @@ export default function Participa() {
                   {availableAvatars.map((avatar) => (
                     <button
                       key={avatar}
-                      onClick={() => setUserProfile(prev => ({ ...prev, avatar }))}
+                      onClick={() => setUserProfile((prev) => ({ ...prev, avatar }))}
                       className={`w-12 h-12 text-2xl rounded-full transition-all duration-300 transform hover:scale-110 ${
                         userProfile.avatar === avatar
                           ? "bg-gradient-to-r from-verdementa to-verdeclaro shadow-lg scale-110"
@@ -714,7 +910,7 @@ export default function Participa() {
                 <input
                   type="text"
                   value={userProfile.name}
-                  onChange={(e) => setUserProfile(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setUserProfile((prev) => ({ ...prev, name: e.target.value }))}
                   placeholder="Ej: María García"
                   className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
                 />
@@ -726,7 +922,7 @@ export default function Participa() {
                 <input
                   type="text"
                   value={userProfile.nickname}
-                  onChange={(e) => setUserProfile(prev => ({ ...prev, nickname: e.target.value }))}
+                  onChange={(e) => setUserProfile((prev) => ({ ...prev, nickname: e.target.value }))}
                   placeholder="Ej: EcoHéroe"
                   className="w-full p-4 bg-blanco border-2 border-verdeclaro/30 rounded-2xl focus:border-verdementa focus:outline-none font-inter text-lg"
                 />

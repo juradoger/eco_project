@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, RotateCcw, AlertCircle, Play, ExternalLink } from 'lucide-react'
+import userService from '../services/user-service'
 
 export default function SepararBasuraGame({ onClose, onComplete }) {
   const [isLoading, setIsLoading] = useState(true)
@@ -34,6 +35,50 @@ export default function SepararBasuraGame({ onClose, onComplete }) {
   const handleOpenInNewTab = () => {
     window.open('/prueba/test.html', '_blank')
   }
+
+  // Simulación: función para cuando termina el juego
+  const handleGameEnd = async (resultado) => {
+    // resultado: { score, tiempo, estrellas, gano }
+    const userProfile = JSON.parse(localStorage.getItem('userProfile'))
+    if (!userProfile || !userProfile.userId) return
+    // Obtener usuario de Firestore
+    const user = await userService.getById(userProfile.userId)
+    const minigames = user.minigames || {}
+    const partidas = minigames['separar-basura'] || []
+    // Agregar nuevo resultado
+    partidas.push({
+      score: resultado.score,
+      tiempo: resultado.tiempo,
+      estrellas: resultado.estrellas,
+      gano: resultado.gano,
+      fecha: new Date().toISOString(),
+    })
+    minigames['separar-basura'] = partidas
+    // (Opcional) actualizar score general si es mejor
+    const newScore = Math.max(user.score || 0, resultado.score)
+    await userService.update({
+      id: userProfile.userId,
+      minigames,
+      score: newScore,
+    })
+    // Llamar callback si existe
+    if (onComplete) onComplete(resultado.score)
+  }
+
+  useEffect(() => {
+    function onMessage(e) {
+      if (e.data && e.data.type === 'MINIGAME_RESULT' && e.data.minigame === 'separar-basura') {
+        handleGameEnd({
+          score: e.data.score,
+          tiempo: e.data.tiempo,
+          estrellas: e.data.estrellas,
+          gano: e.data.gano
+        });
+      }
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-negro/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
