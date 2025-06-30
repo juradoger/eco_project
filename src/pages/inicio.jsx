@@ -4,11 +4,32 @@ import mundoImg from "../assets/mundo.png"
 import florImg from "../assets/flor.png"
 import arbolImg from "../assets/Arbol.png"
 import pezImg from "../assets/pez.png"
-import capetaImg from "../assets/Capeta.png"
-import lupaImg from "../assets/lupa.png"
 import juegoImg from "../assets/juego.png"
+import separaImg from "../assets/Separa.jpeg"
+import lagoLimpioImg from "../assets/lagolimpio.jpeg"
 
-// Imagenes para las cards (puedes cambiar las URLs)
+import { useNavigate } from "react-router-dom"
+
+// Función para manejar la navegación a los juegos
+const handleGameNavigation = (gameIndex) => {
+  const gameRoutes = {
+    0: "/juegos/separar-basura",
+    1: "/juegos/lago-limpio"
+  }
+  
+  const route = gameRoutes[gameIndex]
+  if (route) {
+    window.location.href = route
+  }
+}
+
+// Función para verificar si el juego está disponible
+const isGameAvailable = (gameIndex) => {
+  // Aquí puedes agregar lógica para verificar si el juego está habilitado
+  // Por ejemplo, verificar si el usuario ha completado niveles anteriores
+  return true
+}
+
 const cardImages = [
   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1506744364301-61506b40fd6e?auto=format&fit=crop&w=800&q=80'
@@ -19,7 +40,7 @@ export default function Inicio() {
   const [currentGame, setCurrentGame] = useState(0)
   const [usuarioNino, setUsuarioNino] = useState(null)
 
-  // Efecto parallax sutil
+ 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener("scroll", handleScroll)
@@ -33,28 +54,28 @@ export default function Inicio() {
     }
   }, [])
 
-  // Datos para los juegos
+ 
   const games = [
     {
       icon: "🗂️",
-      title: "Clasificador Ecológico",
+      title: "Separa la Basura",
       description:
-        "Arrastra cada residuo al contenedor correcto. ¡Conviértete en un experto del reciclaje mientras juegas!",
+        "Arrastra cada residuo al contenedor correcto y aprende a reciclar jugando. ¡Demuestra tus habilidades ecológicas!",
       buttonText: "¡Jugar ahora!",
-      image: capetaImg,
+      image: separaImg,
     },
     {
       icon: "🔍",
-      title: "Detective Ambiental",
-      description: "Encuentra todos los elementos contaminantes en la imagen. ¡Pon a prueba tu ojo ecológico!",
-      buttonText: "¡Investigar!",
-      image: lupaImg,
+      title: "Lago Limpio",
+      description: "Encuentra y elimina los elementos contaminantes del lago. ¡Ayuda a mantener el agua limpia y salva la naturaleza!",
+      buttonText: "¡Jugar ahora!",
+      image: lagoLimpioImg,
     },
   ]
 
   return (
     <div className="min-h-screen bg-blancoverdoso overflow-hidden relative">
-      {/* Burbujas animadas de fondo */}
+   
       <div className="fixed inset-0 pointer-events-none z-0">
         {[...Array(12)].map((_, i) => {
           const size = Math.random() * 60 + 60;
@@ -80,7 +101,7 @@ export default function Inicio() {
         })}
       </div>
 
-      {/* Hero Section */}
+    
       <section className="relative min-h-screen flex items-center justify-center px-4">
         <div
           className="absolute inset-0 bg-gradient-to-br from-verdementa/20 to-verdeclaro/20"
@@ -88,29 +109,29 @@ export default function Inicio() {
         />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto">
-          {/* Planeta Tierra */}
+         
           <div className="mb-8">
             <div className="relative w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] mx-auto">
-              {/* Sombra exterior */}
+             
               <div className="absolute inset-0 bg-gradient-to-br from-verdementa/30 to-azulprofundo/30 rounded-full blur-3xl scale-110 animate-pulse"></div>
               
-              {/* Contenedor principal con gradiente */}
+              
               <div className="relative w-full h-full bg-gradient-to-br from-verdementa/20 via-verdeesmeralda/30 to-azulprofundo/20 rounded-full flex items-center justify-center shadow-2xl animate-float overflow-hidden border-4 border-white/20 backdrop-blur-sm">
-                {/* Imagen del mundo */}
+               
                 <img 
                   src={mundoImg} 
                   alt="Planeta Tierra" 
                   className="w-full h-full object-cover rounded-full shadow-inner hover:scale-105 transition-transform duration-700 ease-out"
                 />
                 
-                {/* Overlay de brillo */}
+              
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 rounded-full pointer-events-none"></div>
                 
-                {/* Efecto de resplandor */}
+                
                 <div className="absolute inset-0 bg-gradient-to-br from-verdementa/20 to-verdeesmeralda/20 rounded-full animate-pulse opacity-60"></div>
               </div>
               
-              {/* Partículas flotantes alrededor */}
+             
               <div className="absolute inset-0 pointer-events-none">
                 {[...Array(6)].map((_, i) => (
                   <div
@@ -236,14 +257,19 @@ export default function Inicio() {
 
                 {/* Botón cool */}
                 <div className="pt-4">
-                  <button className="bg-gradient-to-r from-azulprofundo to-verdeesmeralda hover:from-verdeesmeralda hover:to-azulprofundo text-blanco font-lato font-bold py-3 px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center gap-3 mx-auto group/button text-base md:text-lg">
+                  <a
+                    href={currentGame === 0 ? "/prueba/separar_basura.html" : "/prueba/lago_limpio.html"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-azulprofundo to-verdeesmeralda hover:from-verdeesmeralda hover:to-azulprofundo text-blanco font-lato font-bold py-3 px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center gap-3 mx-auto group/button text-base md:text-lg"
+                  >
                     <span>{games[currentGame].buttonText}</span>
                     {currentGame === 0 ? (
                       <Recycle className="w-6 h-6 group-hover/button:rotate-180 transition-transform duration-500" />
                     ) : (
                       <Target className="w-6 h-6 group-hover/button:scale-125 transition-transform duration-300" />
                     )}
-                  </button>
+                  </a>
                 </div>
               </div>
 

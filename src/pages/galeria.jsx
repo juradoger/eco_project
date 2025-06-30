@@ -25,6 +25,7 @@ import {
 import { getDocs, collection } from "firebase/firestore"
 import { FirebaseDB } from "../firebase/config"
 import { uploadGalleryImage } from "../services/gallery-service"
+import galeriaImg from "../assets/galeria.png"
 
 export default function Galeria() {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -318,8 +319,9 @@ export default function Galeria() {
           </div>
 
           <h1 className="font-lato text-5xl md:text-7xl font-bold mb-6 leading-tight relative italic">
-            <span className="bg-gradient-to-r from-verdementa via-verdeesmeralda to-azulprofundo bg-clip-text text-transparent animate-pulse">
-              📸 Nuestra Galería Verde
+            <span className="bg-gradient-to-r from-verdementa via-verdeesmeralda to-azulprofundo bg-clip-text text-transparent animate-pulse flex items-center gap-6 justify-center">
+              <img src={galeriaImg} alt="Galería" className="w-24 h-24 md:w-32 md:h-32 object-contain inline-block animate-bounce" />
+              Nuestra Galería Verde
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent animate-pulse opacity-50 blur-sm"></div>
           </h1>

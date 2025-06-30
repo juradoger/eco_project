@@ -27,6 +27,7 @@ export const uploadGalleryImage = async (file, metadata) => {
       author: metadata.author,
       thumbnail: metadata.thumbnail,
       downloadUrl: downloadURL,
+      imageUrl: downloadURL,
       fileName: fileName,
       likes: 0,
       downloads: 0,

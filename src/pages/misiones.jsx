@@ -3,18 +3,21 @@ import { Play, Star, Trophy, Zap, Sparkles, ArrowRight, Clock, Users, Award, Che
 import avionImg from "../assets/avion.png"
 import reciclajeImg from "../assets/reciclaje.png"
 import lupaImg from "../assets/lupa.png"
+import SepararBasuraGame from "../components/SepararBasuraGame"
+import LagoLimpioGame from "../components/LagoLimpioGame"
 
 export default function Misiones() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [completedMissions, setCompletedMissions] = useState([])
+  const [activeGame, setActiveGame] = useState(null)
 
   // Datos de las misiones
   const missions = [
     {
       id: 1,
-      title: "Clasificador Maestro",
-      subtitle: "Separar residuos",
-      description: "Arrastra cada objeto al contenedor correcto y conviértete en un experto del reciclaje",
+      title: "Separa la Basura",
+      subtitle: "Clasifica los residuos",
+      description: "Arrastra cada residuo al contenedor correcto y conviértete en un héroe del reciclaje.",
       icon: reciclajeImg,
       difficulty: "Fácil",
       time: "5 min",
@@ -24,12 +27,13 @@ export default function Misiones() {
       color: "from-verdementa to-verdeclaro",
       bgPattern: "🗂️📦🔄",
       category: "Juego Digital",
+      gameType: "separar-basura",
     },
     {
       id: 2,
-      title: "Detective Verde",
-      subtitle: "Detectar contaminación",
-      description: "Encuentra todos los elementos que dañan el medio ambiente en esta imagen misteriosa",
+      title: "Lago Limpio",
+      subtitle: "Elimina la contaminación",
+      description: "Encuentra y elimina los elementos contaminantes del lago para proteger la naturaleza.",
       icon: lupaImg,
       difficulty: "Medio",
       time: "8 min",
@@ -37,8 +41,9 @@ export default function Misiones() {
       players: "856",
       type: "game",
       color: "from-verdeesmeralda to-azulprofundo",
-      bgPattern: "🕵️‍♀️🌍🔎",
+      bgPattern: "🕵️‍♀️🌊🔎",
       category: "Juego Digital",
+      gameType: "lago-limpio",
     },
   ]
 
@@ -57,7 +62,17 @@ export default function Misiones() {
 
   const handleMissionClick = (mission) => {
     console.log(`Iniciando misión: ${mission.title}`)
-    // Aquí se integrará la navegación a los juegos
+    setActiveGame(mission.gameType)
+  }
+
+  const handleGameClose = () => {
+    setActiveGame(null)
+  }
+
+  const handleGameComplete = (gameType, score) => {
+    console.log(`Juego completado: ${gameType} con puntuación: ${score}`)
+    setCompletedMissions(prev => [...prev, { gameType, score, completedAt: new Date() }])
+    setActiveGame(null)
   }
 
   return (
@@ -93,7 +108,7 @@ export default function Misiones() {
           </div>
 
           <h1 className="font-lato text-6xl md:text-8xl font-bold mb-8 leading-tight relative flex items-center justify-center gap-4">
-            <img src={avionImg} alt="Avión" className="w-16 h-16 md:w-24 md:h-24 object-contain animate-bounce" />
+            <img src={avionImg} alt="Avión" className="w-40 h-40 md:w-56 md:h-56 object-contain animate-bounce" />
             <span className="bg-gradient-to-r from-verdementa via-verdeesmeralda to-azulprofundo bg-clip-text text-transparent animate-pulse">
               ¡Misiones Ecológicas!
             </span>
@@ -199,79 +214,55 @@ export default function Misiones() {
                       </div>
                       <div className="text-center transform hover:scale-110 transition-all duration-300">
                         <div className="flex items-center justify-center gap-2 mb-2">
-                          <Users className="w-5 h-5 text-verdementa animate-pulse" />
+                          <Users className="w-5 h-5 text-azulprofundo animate-pulse" />
                         </div>
                         <div className="font-lato text-sm font-bold text-azulprofundo">{mission.players}</div>
                       </div>
                     </div>
 
-                    {/* Botón de acción mejorado con más efectos dinámicos */}
+                    {/* Botón de acción mejorado */}
                     <button
                       onClick={() => handleMissionClick(mission)}
-                      className={`w-full bg-gradient-to-r ${mission.color} hover:shadow-2xl text-blanco font-lato font-bold py-5 px-8 rounded-2xl transition-all duration-500 transform hover:scale-105 flex items-center justify-center gap-4 group/button relative overflow-hidden border-2 border-transparent hover:border-blanco/30`}
+                      className={`w-full bg-gradient-to-r ${mission.color} hover:shadow-xl text-blanco font-lato font-bold py-4 px-8 rounded-2xl transition-all duration-500 transform hover:scale-105 flex items-center justify-center gap-3 group/button relative overflow-hidden`}
                     >
-                      {/* Efectos de ondas mejorados */}
-                      <div className="absolute inset-0 bg-blanco/25 rounded-2xl scale-0 group-hover/button:scale-100 transition-transform duration-500"></div>
+                      {/* Efectos de ondas */}
+                      <div className="absolute inset-0 bg-blanco/20 rounded-2xl scale-0 group-hover/button:scale-100 transition-transform duration-500"></div>
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blanco/15 to-transparent -translate-x-full group-hover/button:translate-x-full transition-transform duration-700"></div>
-
-                      <Play className="w-6 h-6 group-hover/button:scale-125 group-hover/button:rotate-12 transition-all duration-300 relative z-10" />
-                      <span className="relative z-10 text-lg">
-                        {mission.type === "game" ? "¡Jugar Ahora!" : "¡Comenzar Misión!"}
-                      </span>
-                      <ArrowRight className="w-6 h-6 group-hover/button:translate-x-2 group-hover/button:scale-110 transition-all duration-300 relative z-10" />
+                      
+                      <Play className="w-6 h-6 relative z-10 group-hover/button:scale-125 group-hover/button:rotate-12 transition-all duration-300" />
+                      <span className="relative z-10 text-lg">¡Jugar ahora!</span>
                     </button>
-                  </div>
 
-                  {/* Indicador de completado mejorado */}
-                  {completedMissions.includes(mission.id) && (
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-blanco rounded-full p-5 shadow-2xl animate-pulse">
-                        <CheckCircle className="w-10 h-10" />
+                    {/* Indicador de completado */}
+                    {completedMissions.some(m => m.gameType === mission.gameType) && (
+                      <div className="absolute top-4 right-4 z-20">
+                        <div className="bg-green-500 text-blanco p-2 rounded-full shadow-lg animate-pulse">
+                          <CheckCircle className="w-6 h-6" />
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-
-                {/* Sombra dinámica mejorada */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-r ${mission.color} rounded-3xl blur-2xl opacity-0 group-hover:opacity-30 transition-all duration-700 -z-10 scale-90 group-hover:scale-110`}
-                ></div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer motivacional mejorado */}
-      <section className="py-20 px-4 bg-gradient-to-r from-verdementa/30 to-verdeclaro/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-br from-blanco to-verdeclaro/10 rounded-3xl p-10 shadow-2xl border-2 border-verdementa/30 transform hover:scale-105 transition-all duration-500">
-            <div className="flex justify-center gap-6 mb-8">
-              <div className="text-5xl animate-bounce filter drop-shadow-lg">🌟</div>
-              <div className="text-5xl animate-bounce filter drop-shadow-lg" style={{ animationDelay: "0.3s" }}>
-                🏆
-              </div>
-              <div className="text-5xl animate-bounce filter drop-shadow-lg" style={{ animationDelay: "0.6s" }}>
-                🌍
-              </div>
-            </div>
-            <h2 className="font-lato text-4xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-verdementa via-verdeesmeralda to-azulprofundo bg-clip-text text-transparent animate-pulse">
-                ¡Cada misión cuenta para salvar el planeta!
-              </span>
-            </h2>
-            <p className="font-inter text-azulprofundo/90 text-xl mb-8 leading-relaxed font-semibold">
-              Completa misiones, gana puntos y únete a miles de Eco-Detectives que están haciendo la diferencia
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              <div className="bg-gradient-to-r from-verdementa to-verdeclaro text-blanco px-8 py-4 rounded-full font-lato font-bold flex items-center gap-3 shadow-2xl transform hover:scale-110 transition-all duration-300 border-2 border-blanco/20">
-                <Award className="w-6 h-6 animate-pulse" />
-                <span className="text-lg">Próximamente: Más misiones</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Renderizar juegos activos */}
+      {activeGame === 'separar-basura' && (
+        <SepararBasuraGame 
+          onClose={handleGameClose}
+          onComplete={(score) => handleGameComplete('separar-basura', score)}
+        />
+      )}
+
+      {activeGame === 'lago-limpio' && (
+        <LagoLimpioGame 
+          onClose={handleGameClose}
+          onComplete={(score) => handleGameComplete('lago-limpio', score)}
+        />
+      )}
     </div>
   )
 }
